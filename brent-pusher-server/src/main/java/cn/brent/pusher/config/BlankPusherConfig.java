@@ -1,6 +1,7 @@
 package cn.brent.pusher.config;
 
 import cn.brent.pusher.plugin.CleanUpPlugin;
+import cn.brent.pusher.plugin.JettyServicePlugin;
 import cn.brent.pusher.plugin.MonitorPlugin;
 import cn.brent.pusher.server.PathDesc;
 import cn.brent.pusher.session.Session;
@@ -30,6 +31,7 @@ public class BlankPusherConfig extends PusherConfig {
 	public void configPlugin(Plugins me) {
 		me.add(new CleanUpPlugin(60*20, 10));
 		me.add(new MonitorPlugin(3));
+		me.add(new JettyServicePlugin(8888));
 	}
 	
 	@Override

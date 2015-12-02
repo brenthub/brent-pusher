@@ -19,9 +19,6 @@ public class PushMsg implements Serializable {
 
 	private Map<String, Object> data = new HashMap<String, Object>();
 
-	public PushMsg() {
-	}
-
 	public PushMsg(String biz, String key, boolean sucessClose,
 			Map<String, Object> data) {
 		super();

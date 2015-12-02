@@ -7,6 +7,14 @@
 		<version>1.0</version>
 	</parent>
 	<artifactId>brent-pusher-server</artifactId>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.3.0.M2</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<finalName>brent-pusher</finalName>
