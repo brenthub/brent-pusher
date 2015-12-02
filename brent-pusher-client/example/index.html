@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebSocket Chat Client</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+WEB_SOCKET_SWF_LOCATION = "web-socket-js/WebSocketMain.swf";
+</script>
+
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="web-socket-js/swfobject.js"></script>
+<script type="text/javascript" src="web-socket-js/web_socket.js"></script>
+</head>
+
+<body>
+	<script type="text/javascript">
+		var ws;
+		function initWs(url){
+			ws = new WebSocket(url);
+			ws.onopen = function() {
+				console.log('连接成功')
+			}
+			ws.onmessage = function(e) {
+				console.log(e.data)
+				var obj = JSON.parse(e.data);
+				if(obj.success){
+					alert("收到消息");
+				}
+			}
+			ws.onclose = function(e) {
+				console.log('连接关闭',e.code+":"+e.reason)
+				if(e.code==1000){//正常关闭（超时、业务已完成）
+					//do nothing
+				}else if(e.code==1003){//服务器拒绝连接
+					//do nothing
+				}else{//重新连接
+					initWs(url);
+				}
+			}
+		}
+		$(document).ready(function() {
+			initWs("ws://localhost:8887/order/1000000?sign=000000");
+		});
+	</script>
+	等待推送结果。。。。
+</body>
+</html>
