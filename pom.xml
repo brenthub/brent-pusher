@@ -9,6 +9,7 @@
 		<module>brent-pusher-server</module>
 		<module>brent-pusher-client</module>
 		<module>brent-pusher-stresstest</module>
+		<module>brent-pusher-core</module>
 	</modules>
 
 	<properties>
