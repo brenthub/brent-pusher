@@ -1,6 +1,6 @@
 package cn.brent.pusher.netty;
 
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
@@ -9,15 +9,19 @@ import java.util.Map;
 
 import cn.brent.pusher.core.IPusherClient;
 
-public class PusherChannel extends NioSocketChannel implements IPusherClient {
-
-	protected final AttributeKey<Long> CREATE_TIME = AttributeKey.newInstance("createTime");
+public class PusherChannel extends NioServerSocketChannel implements IPusherClient {
 
 	protected final AttributeKey<String> TOPIC = AttributeKey.newInstance("topic");
 
 	protected final AttributeKey<String> KEY = AttributeKey.newInstance("key");
 
 	protected final AttributeKey<Map<String, Object>> ATTRS = AttributeKey.newInstance("attrs");
+	
+	protected final long createTime;
+	
+	public PusherChannel() {
+		createTime=System.currentTimeMillis();
+	}
 
 	/* (non-Javadoc)
 	 * @see cn.brent.pusher.core.IClientChannel#getAttr(java.lang.String)
@@ -99,20 +103,17 @@ public class PusherChannel extends NioSocketChannel implements IPusherClient {
 	 */
 	@Override
 	public long getCreateTime() {
-		Attribute<Long> attribute = attr(CREATE_TIME);
-		return attribute.get();
+		return this.createTime;
 	}
 
 	@Override
 	public void close(int code, String reason) {
-		// TODO Auto-generated method stub
-		
+		this.close();
 	}
 
 	@Override
 	public void send(String message) {
-		// TODO Auto-generated method stub
-		
+		this.writeAndFlush(message);
 	}
 
 }

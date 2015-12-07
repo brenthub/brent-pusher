@@ -29,6 +29,7 @@ public abstract class PusherServer {
 	protected int port;
 	
 	public PusherServer(PusherConfig pushConfig) {
+		this.pushConfig=pushConfig;
 		Config.configPusher(pushConfig);
 		port=Config.getConstants().getPort();
 		sessionManager=Config.getConstants().getSessionManager();
