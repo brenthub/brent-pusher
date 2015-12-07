@@ -6,14 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.framing.CloseFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.brent.pusher.IPlugin;
 import cn.brent.pusher.core.Config;
-import cn.brent.pusher.core.PusherWebSocket;
+import cn.brent.pusher.core.IPusherClient;
 import cn.brent.pusher.session.ISessionManager;
 
 public class CleanUpPlugin implements IPlugin {
@@ -57,13 +55,13 @@ public class CleanUpPlugin implements IPlugin {
 		threadPool.execute(new Runnable() {
 			@Override
 			public void run() {
-				Iterator<WebSocket> it = ISessionManager.socketQueue.iterator();
+				Iterator<IPusherClient> it = ISessionManager.clientQueue.iterator();
 				while (it.hasNext()) {
-					PusherWebSocket conn = (PusherWebSocket) it.next();
+					IPusherClient conn = (IPusherClient) it.next();
 					if (System.currentTimeMillis() - conn.getCreateTime() >= timeout * 1000) {
 						logger.debug("cleanUp remove connect:" + conn);
 						Config.getConstants().getSessionManager().removeConnect(conn);
-						conn.close(CloseFrame.NORMAL, "connect timeout");
+//						conn.close(CloseFrame.NORMAL, "connect timeout");
 					} else {// 第一次出现不超时，后面也不会超时
 						return;
 					}

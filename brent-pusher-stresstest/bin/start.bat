@@ -1,7 +1,7 @@
 @echo off & setlocal enabledelayedexpansion
 
 set TITLE=StressTest Console
-set MAIN_CLASS=cn.brent.pusher.stresstest.StressRunner
+set MAIN_CLASS=cn.brent.pusher.stress.StressRunner
 set JAVA_OPTS=-Xms64m -Xmx512m -XX:MaxNewSize=128m -XX:MaxPermSize=64m
 
 set CURRENT_DIR=%cd%

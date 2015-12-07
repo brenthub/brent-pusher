@@ -1,31 +1,20 @@
 package cn.brent.pusher.core;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
-import org.java_websocket.WebSocket;
-import org.java_websocket.framing.CloseFrame;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.brent.pusher.IPlugin;
 import cn.brent.pusher.IVerifier;
-import cn.brent.pusher.PushMsg;
 import cn.brent.pusher.config.PusherConfig;
 import cn.brent.pusher.session.ISessionManager;
 import cn.brent.pusher.session.Session;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-public class PusherServer extends WebSocketServer {
-
-	protected static Logger log = LoggerFactory.getLogger(PusherServer.class);
+public abstract class PusherServer {
 	
+	protected static Logger logger = LoggerFactory.getLogger(PusherServer.class);
+
 	/** 个性化配置 */
-	private PusherConfig pushConfig;
+	protected PusherConfig pushConfig;
 	
 	/** 会话管理 */
 	protected ISessionManager sessionManager;
@@ -36,35 +25,22 @@ public class PusherServer extends WebSocketServer {
 	/** 插件 */
 	protected IPlugin[] plugins;
 	
-	public PusherServer(int port,PusherConfig pushConfig) {
-		this(new InetSocketAddress(port), pushConfig);
-	}
+	/** 端口 */
+	protected int port;
 	
-	public PusherServer(String hostName,int port,PusherConfig pushConfig) {
-		this(new InetSocketAddress(hostName,port), pushConfig);
-	}
-	
-	public PusherServer(InetSocketAddress address,PusherConfig pushConfig) {
-		super(address,DECODERS,null,ISessionManager.socketQueue);
-		this.pushConfig = pushConfig;
-		init();
-	}
-	
-	protected void init(){
+	public PusherServer(PusherConfig pushConfig) {
 		Config.configPusher(pushConfig);
-		setWebSocketFactory(Config.getConstants().getFactory());
+		port=Config.getConstants().getPort();
 		sessionManager=Config.getConstants().getSessionManager();
 		verifiers=Config.getVerifiers().getAll();
 		plugins=Config.getPlugins().getAll();
 	}
-
-	@Override
-	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		String desc = handshake.getResourceDescriptor();
+	
+	protected void onOpen(IPusherClient conn, String uri) {
 		PathDesc path;
 		try {
 			try {
-				path = PathDesc.parse(desc);
+				path = PathDesc.parse(uri);
 			} catch (Exception e) {
 				throw new RuntimeException("Unsupported msg format");
 			}
@@ -76,145 +52,59 @@ public class PusherServer extends WebSocketServer {
 					throw new RuntimeException(verifier.failMsg(path));
 				}
 			}
-			
-			PusherWebSocket pconn=(PusherWebSocket)conn;
-			
-			pconn.setTopic(path.getTopic());
-			pconn.setKey(path.getKey());
 
 			//保存会话信息
-			sessionManager.saveConnect(pconn);
+			sessionManager.saveConnect(conn);
 			
 			//连接成功后的回调
-			pushConfig.afterConnectSuccess(pconn);
+			pushConfig.afterConnectSuccess(conn);
 			
-			log.debug("new connection: " + handshake.getResourceDescriptor() + "," + conn.getRemoteSocketAddress() + " connected!");
+			logger.debug("new connection: " + uri + "," + conn + " connected!");
 		} catch (Exception e) {
-			conn.close(CloseFrame.REFUSE, "rejected connection, "+e.getMessage());
+			conn.close(IPusherClient.REFUSE, "rejected connection, "+e.getMessage());
 		}
-
 	}
-
-	@Override
-	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-		log.debug("PushServer " + conn + " disconnected! reason:" + reason);
-		if (code == CloseFrame.REFUSE) {// 被服务器拒绝
+	
+	protected void onClose(IPusherClient conn, int code, String reason){
+		if (code == IPusherClient.REFUSE) {// 被服务器拒绝
 			// do nothing
 		} else {
-			this.disconnectHandler(conn);
+			logger.debug("connect disconnect...");
+			sessionManager.removeConnect(conn);
 		}
 	}
-
-	@Override
-	public void onMessage(WebSocket conn, String message) {
-		// do nothing
-	}
-
-	/**
-	 * 消息推送处理
-	 * 
-	 * @param conn
-	 * @param k
-	 */
-	public static void push(PushMsg msg) {
-
-		log.info("push msg " + msg);
-
-		if (msg.getTopic() == null) {
-			log.error(msg + "topic is null");
-			return;
-		}
-		if (msg.getKey() == null) {
-			log.error(msg + "key is null");
-			return;
-		}
-		if (msg.getData() == null || msg.getData().size() == 0) {
-			log.error(msg + "data is null");
-			return;
-		}
-
-		Session session = Config.getConstants().getSessionManager().getSession(msg.getTopic(), msg.getKey());
-		if (session == null) {
-			return;
-		}
-		JSON ret = new JSONObject(msg.getData());
-
-		for (WebSocket webc : session.getSockets()) {
-			try {
-				sendMsg(webc, ret.toJSONString());
-			} catch (Exception e) {
-				log.error("push failed:", e);
-			}
-		}
-		if (!msg.isSucessClose()) {
-			return;
-		}
-		try {
-			Thread.sleep(500);// 延迟半秒钟，防止客户端未收到消息就关闭连接了
-		} catch (InterruptedException e1) {
-		}
-		for (WebSocket webc : session.getSockets()) {
-			try {
-				if (webc.isOpen()) {
-					webc.close(CloseFrame.NORMAL, "business completion");
-				}
-			} catch (Exception e) {
-				log.error("push failed:", e);
-			}
-		}
-		Config.getConstants().getSessionManager().removeSession(session);
-	}
-
-	/**
-	 * 发送消息
-	 * 
-	 * @param conn
-	 * @param message
-	 */
-	protected static void sendMsg(WebSocket conn, String message) {
-		synchronized (conn) {
-			if (conn.isOpen()) {
-				conn.send(message);
-			} else {
-				throw new RuntimeException("target webSocket not open");
-			}
-		}
-	}
-
-	@Override
-	public void onError(WebSocket conn, Exception ex) {
-		log.error("PushServer onError:", ex);
-		disconnectHandler(conn);
-	}
-
-	/**
-	 * 客户端断开连接处理
-	 * 
-	 * @param conn
-	 */
-	protected void disconnectHandler(WebSocket conn) {
-		log.debug("connect disconnect...");
-		PusherWebSocket pconn=(PusherWebSocket)conn;
-		sessionManager.removeConnect(pconn);
-	}
-
-	@Override
+	
 	public void start() {
-		super.start();
+		startServer();
 		for(IPlugin p:plugins){
 			p.start();
 		}
 		pushConfig.afterStart();
-		log.info("PushServer started on port:" + this.getPort());
+		logger.info("PushServer started on port:" + this.getPort());
 	}
-
-	@Override
-	public void stop() throws IOException, InterruptedException {
+	
+	public void stop() {
 		pushConfig.beforeStop();
 		for(IPlugin p:plugins){
 			p.stop();
 		}
-		super.stop();
+		this.stopServer();
 	}
+	
+	public int getPort() {
+		return port;
+	}
+	
+	/**
+	 * 停止服务
+	 */
+	protected abstract void stopServer();
 
+	/**
+	 * 开启服务
+	 */
+	protected abstract void startServer();
+
+	
+	
 }

@@ -3,7 +3,7 @@ package cn.brent.pusher.session.imp;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.brent.pusher.core.PusherWebSocket;
+import cn.brent.pusher.core.IPusherClient;
 import cn.brent.pusher.session.ISessionManager;
 import cn.brent.pusher.session.Session;
 
@@ -26,14 +26,14 @@ public class MapSessionManager implements ISessionManager {
 
 
 	@Override
-	public void saveConnect(PusherWebSocket socket) {
+	public void saveConnect(IPusherClient socket) {
 		String name = Session.getName(socket.getTopic(), socket.getKey());
 		Session session=sessionMap.get(name);
 		if(session==null){
 			sessionMap.put(name, new Session(socket.getTopic(), socket.getKey(), socket));
 			return;
 		}
-		session.addSockets(socket);
+		session.addClient(socket);
 	}
 
 
@@ -44,10 +44,10 @@ public class MapSessionManager implements ISessionManager {
 
 
 	@Override
-	public void removeConnect(PusherWebSocket socket) {
+	public void removeConnect(IPusherClient socket) {
 		Session session=getSession(socket.getTopic(), socket.getKey());
 		if(session!=null){
-			session.removeSocket(socket);
+			session.removeClient(socket);
 		}
 	}
 

@@ -20,7 +20,7 @@ public class ServerRunner {
 			return;
 		}
 		
-		String port=p.getProperty("port", "8887");
+		String serverClass=p.getProperty("serverClass", "cn.brent.pusher.config.BlankPusherConfig");
 		String configClass=p.getProperty("configClass", "cn.brent.pusher.config.BlankPusherConfig");
 		
 		Object obj;
@@ -29,11 +29,20 @@ public class ServerRunner {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
-		} 
+		}
+		
 		if(obj instanceof PusherConfig){
 			PusherConfig config=(PusherConfig)obj;
-			PusherServer server=new PusherServer(Integer.parseInt(port),config);
-			server.start();
+			
+			Object server;
+			try {
+				server = Class.forName(serverClass).getConstructor(PusherConfig.class).newInstance(config);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			} 
+			PusherServer sv=(PusherServer)server;
+			sv.start();
 		}else{
 			System.out.println("");
 			return;

@@ -3,9 +3,7 @@ package cn.brent.pusher.session;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.java_websocket.WebSocket;
-
-import cn.brent.pusher.core.PusherWebSocket;
+import cn.brent.pusher.core.IPusherClient;
 
 /**
  * 会话管理器
@@ -13,19 +11,19 @@ import cn.brent.pusher.core.PusherWebSocket;
 public interface ISessionManager {
 
 	/** 连接队列 */
-	final static Queue<WebSocket> socketQueue = new LinkedList<WebSocket>();
+	final static Queue<IPusherClient> clientQueue = new LinkedList<IPusherClient>();
 	
 	/**
 	 * 保存socket
 	 * @param socket
 	 */
-	void saveConnect(PusherWebSocket socket);
+	void saveConnect(IPusherClient socket);
 	
 	/**
 	 * 移除socket
 	 * @param socket
 	 */
-	void removeConnect(PusherWebSocket socket);
+	void removeConnect(IPusherClient socket);
 	
 	/**
 	 * 根据业务编码和key获取Session

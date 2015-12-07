@@ -20,7 +20,7 @@ public class MonitorPlugin implements IPlugin {
 	}
 	
 	protected void log() {
-		logger.info(ISessionManager.socketQueue.size()+"");
+		logger.info(ISessionManager.clientQueue.size()+"");
 	}
 
 	@Override

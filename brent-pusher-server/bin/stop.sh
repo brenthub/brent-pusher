@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVER_NAME=BrentBus
+SERVER_NAME=BrentPusher
 
 cd `dirname $0`
 BIN_DIR=`pwd`

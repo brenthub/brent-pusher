@@ -1,6 +1,5 @@
 package cn.brent.pusher.config;
 
-import cn.brent.pusher.core.PusherSocketFactory;
 import cn.brent.pusher.session.ISessionManager;
 import cn.brent.pusher.session.imp.MapSessionManager;
 
@@ -11,9 +10,8 @@ final public class Constants {
 
 	/** 连接保存者 */
 	protected ISessionManager sessionManager=new MapSessionManager();
-	
-	/** 连接工厂*/
-	private PusherSocketFactory factory = new PusherSocketFactory();
+
+	protected int port=8887;
 
 	public ISessionManager getSessionManager() {
 		return sessionManager;
@@ -23,12 +21,12 @@ final public class Constants {
 		this.sessionManager = sessionManager;
 	}
 
-	public PusherSocketFactory getFactory() {
-		return factory;
+	public int getPort() {
+		return port;
 	}
 
-	public void setFactory(PusherSocketFactory factory) {
-		this.factory = factory;
+	public void setPort(int port) {
+		this.port = port;
 	}
 	
 }

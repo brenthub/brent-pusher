@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.brent.pusher.core.PusherWebSocket;
+import cn.brent.pusher.core.IPusherClient;
 
 public class Session {
 	
@@ -22,17 +22,17 @@ public class Session {
 	protected String topic;
 
 	/** WebSockets */
-	protected Collection<PusherWebSocket> sockets=new ArrayList<PusherWebSocket>();
+	protected Collection<IPusherClient> clients=new ArrayList<IPusherClient>();
 	
 	/** 属性 */
 	protected Map<String,Object> attrs;
 
-	public Session(String topic, String key, PusherWebSocket socket) {
+	public Session(String topic, String key, IPusherClient socket) {
 		super();
 		this.name = getName(topic, key);
 		this.key=key;
 		this.topic=topic;
-		this.addSockets(socket);
+		this.addClient(socket);
 		this.createTime = System.currentTimeMillis();
 	}
 	
@@ -50,16 +50,16 @@ public class Session {
 		return createTime;
 	}
 
-	public Collection<PusherWebSocket> getSockets() {
-		return sockets;
+	public Collection<IPusherClient> getClients() {
+		return clients;
 	}
 	
-	public void addSockets(PusherWebSocket socket) {
-		sockets.add(socket);
+	public void addClient(IPusherClient socket) {
+		clients.add(socket);
 	}
 	
-	public void removeSocket(PusherWebSocket socket) {
-		sockets.remove(socket);
+	public void removeClient(IPusherClient socket) {
+		clients.remove(socket);
 	}
 	
 	public String getName() {

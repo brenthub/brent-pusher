@@ -17,7 +17,7 @@ public class SocketLimitVerifier implements IVerifier {
 		if(session==null){
 			return true;
 		}
-		if(session.getSockets().size()>=num){
+		if(session.getClients().size()>=num){
 			return false;
 		}
 		return true;

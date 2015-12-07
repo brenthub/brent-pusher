@@ -1,6 +1,7 @@
 package cn.brent.pusher.config;
 
-import cn.brent.pusher.core.PusherWebSocket;
+import cn.brent.pusher.core.IPusherClient;
+
 
 /**
  * 配置管理
@@ -35,5 +36,5 @@ public abstract class PusherConfig {
 	/**
 	 * Call back after Connect Success
 	 */
-	public void afterConnectSuccess(PusherWebSocket socket){};
+	public void afterConnectSuccess(IPusherClient socket){};
 }
