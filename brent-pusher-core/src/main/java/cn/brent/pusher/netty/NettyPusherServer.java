@@ -11,7 +11,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -54,7 +53,7 @@ public class NettyPusherServer extends PusherServer {
 				try {
 					ServerBootstrap b = new ServerBootstrap();
 					b.group(parentGroup, workGroup);
-					b.channel(PusherChannel.class);
+					b.channel(PusherServerSocketChannel.class);
 					b.childHandler(new ChildChannelHandler());
 					Channel ch = b.bind(getPort()).sync().channel();
 					ch.closeFuture().sync();
@@ -67,10 +66,11 @@ public class NettyPusherServer extends PusherServer {
 			}
 		}).start();
 	}
+	
 
-	public class ChildChannelHandler extends ChannelInitializer<SocketChannel> {
+	public class ChildChannelHandler extends ChannelInitializer<PusherChannel> {
 		@Override
-		protected void initChannel(SocketChannel ch) throws Exception {
+		protected void initChannel(PusherChannel ch) throws Exception {
 			ch.pipeline().addLast("http-codec", new HttpServerCodec());
 			ch.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
 			ch.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
@@ -83,23 +83,19 @@ public class NettyPusherServer extends PusherServer {
 		private WebSocketServerHandshaker handshaker;
 
 		@Override
-		public void channelActive(ChannelHandlerContext ctx) throws Exception {
-			IPusherClient conn=(IPusherClient)ctx.channel();
-			onOpen(conn, "/order/1?sign=1");
-		}
-
-		@Override
-		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-			IPusherClient conn=(IPusherClient)ctx.channel();
-			onClose(conn, IPusherClient.NORMAL, "");
-		}
-
-		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
 			if (msg instanceof FullHttpRequest) {
 				handleHttpRequest(ctx, ((FullHttpRequest) msg));
 			} else if (msg instanceof WebSocketFrame) {
 				handlerWebSocketFrame(ctx, (WebSocketFrame) msg);
+			}
+		}
+		
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			IPusherClient conn=(IPusherClient)ctx.channel();
+			if(conn.getKey()!=null&&conn.getTopic()!=null){
+				onClose(conn, IPusherClient.NORMAL, "");
 			}
 		}
 		
@@ -132,12 +128,15 @@ public class NettyPusherServer extends PusherServer {
 				sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
 				return;
 			}
-			WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory("ws://localhost:8887", null, false);
+			WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory("ws://websocket.url", null, false);
 			handshaker = wsFactory.newHandshaker(req);
 			if (handshaker == null) {
 				WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
 			} else {
+				IPusherClient conn=(IPusherClient)ctx.channel();
+				String uri=req.getUri();
 				handshaker.handshake(ctx.channel(), req);
+				onOpen(conn, uri);
 			}
 		}
 
@@ -150,13 +149,9 @@ public class NettyPusherServer extends PusherServer {
 			}
 			// 如果是非Keep-Alive，关闭连接
 			ChannelFuture f = ctx.channel().writeAndFlush(res);
-			if (!isKeepAlive(req) || res.getStatus().code() != 200) {
+			if (res.getStatus().code() != 200) {
 				f.addListener(ChannelFutureListener.CLOSE);
 			}
-		}
-
-		private boolean isKeepAlive(FullHttpRequest req) {
-			return false;
 		}
 
 		@Override

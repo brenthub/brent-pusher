@@ -20,35 +20,39 @@ public class MapSessionManager implements ISessionManager {
 
 	@Override
 	public void removeSession(String topic, String key) {
-		String name = Session.getName(topic, key);
-		sessionMap.remove(name);
+		this.removeSession(getSession(topic, key));
 	}
 
 
 	@Override
-	public void saveConnect(IPusherClient socket) {
-		String name = Session.getName(socket.getTopic(), socket.getKey());
+	public void saveConnect(IPusherClient client) {
+		String name = Session.getName(client.getTopic(), client.getKey());
 		Session session=sessionMap.get(name);
 		if(session==null){
-			sessionMap.put(name, new Session(socket.getTopic(), socket.getKey(), socket));
-			return;
+			session=new Session(client.getTopic(), client.getKey());
+			sessionMap.put(name, session);
 		}
-		session.addClient(socket);
+		session.addClient(client);
+		clientQueue.add(client);
 	}
 
 
 	@Override
 	public void removeSession(Session session) {
 		this.removeSession(session.getTopic(), session.getKey());
+		for(IPusherClient client:session.getClients()){
+			clientQueue.remove(client);
+		}
 	}
 
 
 	@Override
-	public void removeConnect(IPusherClient socket) {
-		Session session=getSession(socket.getTopic(), socket.getKey());
+	public void removeConnect(IPusherClient client) {
+		Session session=getSession(client.getTopic(), client.getKey());
 		if(session!=null){
-			session.removeClient(socket);
+			session.removeClient(client);
 		}
+		clientQueue.remove(client);
 	}
 
 }

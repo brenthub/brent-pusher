@@ -27,13 +27,16 @@ public class Session {
 	/** 属性 */
 	protected Map<String,Object> attrs;
 
-	public Session(String topic, String key, IPusherClient socket) {
-		super();
+	public Session(String topic, String key) {
 		this.name = getName(topic, key);
 		this.key=key;
 		this.topic=topic;
-		this.addClient(socket);
 		this.createTime = System.currentTimeMillis();
+	}
+	
+	public Session(String topic, String key, IPusherClient socket) {
+		this(topic, key);
+		this.addClient(socket);
 	}
 	
 	/**

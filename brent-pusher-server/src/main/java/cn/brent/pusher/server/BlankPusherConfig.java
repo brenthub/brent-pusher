@@ -32,7 +32,7 @@ public class BlankPusherConfig extends PusherConfig {
 	
 	@Override
 	public void configPlugin(Plugins me) {
-		me.add(new CleanUpPlugin(60*20, 10));
+		me.add(new CleanUpPlugin(10, 10));
 		me.add(new MonitorPlugin(3));
 	}
 	

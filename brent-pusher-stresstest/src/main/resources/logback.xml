@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{HH:mm:ss} %-5level %logger{80} [%line] - %msg%n</Pattern>
+		</encoder>
+	</appender>
+	
+	<property name="logbase" value="logs" />
+	
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> <!-- rollover daily --> 
+			<fileNamePattern>${logbase}/run-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"> <!-- or whenever the remoteFile size reaches 100MB -->
+				<maxFileSize>20MB</maxFileSize> 
+			</timeBasedFileNamingAndTriggeringPolicy> 
+		</rollingPolicy> 
+		<encoder charset="UTF-8"> 
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n</pattern> 
+			 <ImmediateFlush>true</ImmediateFlush> 
+		</encoder> 
+	</appender>
+	
+	<appender name="MONITOR" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> <!-- rollover daily --> 
+			<fileNamePattern>${logbase}/monitor-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"> <!-- or whenever the remoteFile size reaches 100MB -->
+				<maxFileSize>20MB</maxFileSize> 
+			</timeBasedFileNamingAndTriggeringPolicy> 
+		</rollingPolicy> 
+		<encoder charset="UTF-8"> 
+			<pattern>%msg%n</pattern> 
+			 <ImmediateFlush>true</ImmediateFlush> 
+		</encoder> 
+	</appender>
+	
+	<logger name="monitor" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="MONITOR"/>
+	</logger>
+	
+	<logger name="org.eclipse.jetty" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT"/>
+	</logger>
+	
+	<root>
+		<level value="debug" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
+

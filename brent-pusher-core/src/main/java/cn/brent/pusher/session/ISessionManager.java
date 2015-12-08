@@ -1,7 +1,7 @@
 package cn.brent.pusher.session;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import cn.brent.pusher.core.IPusherClient;
 
@@ -11,19 +11,19 @@ import cn.brent.pusher.core.IPusherClient;
 public interface ISessionManager {
 
 	/** 连接队列 */
-	final static Queue<IPusherClient> clientQueue = new LinkedList<IPusherClient>();
+	final List<IPusherClient> clientQueue = new CopyOnWriteArrayList<IPusherClient>();
 	
 	/**
-	 * 保存socket
-	 * @param socket
+	 * 保存client
+	 * @param client
 	 */
-	void saveConnect(IPusherClient socket);
+	void saveConnect(IPusherClient client);
 	
 	/**
-	 * 移除socket
-	 * @param socket
+	 * 移除client
+	 * @param client
 	 */
-	void removeConnect(IPusherClient socket);
+	void removeConnect(IPusherClient client);
 	
 	/**
 	 * 根据业务编码和key获取Session

@@ -75,6 +75,14 @@ public interface IPusherClient {
 	 * @param message
 	 */
 	void send(String message);
+	
+	/**
+	 * 发送消息
+	 * @param message
+	 * @param close 发送成功后是否关闭连接
+	 */
+	void send(String message,boolean close);
+	
 
 	
 }

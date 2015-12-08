@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.brent.pusher.IPlugin;
-import cn.brent.pusher.core.Config;
 import cn.brent.pusher.core.IPusherClient;
 import cn.brent.pusher.session.ISessionManager;
 
@@ -60,8 +59,7 @@ public class CleanUpPlugin implements IPlugin {
 					IPusherClient conn = (IPusherClient) it.next();
 					if (System.currentTimeMillis() - conn.getCreateTime() >= timeout * 1000) {
 						logger.debug("cleanUp remove connect:" + conn);
-						Config.getConstants().getSessionManager().removeConnect(conn);
-//						conn.close(CloseFrame.NORMAL, "connect timeout");
+						conn.close(IPusherClient.NORMAL, "connect timeout");
 					} else {// 第一次出现不超时，后面也不会超时
 						return;
 					}

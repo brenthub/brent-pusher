@@ -53,6 +53,9 @@ public abstract class PusherServer {
 					throw new RuntimeException(verifier.failMsg(path));
 				}
 			}
+			
+			conn.setTopic(path.getTopic());
+			conn.setKey(path.getKey());
 
 			//保存会话信息
 			sessionManager.saveConnect(conn);
@@ -61,6 +64,7 @@ public abstract class PusherServer {
 			pushConfig.afterConnectSuccess(conn);
 			
 			logger.debug("new connection: " + uri + "," + conn + " connected!");
+			
 		} catch (Exception e) {
 			conn.close(IPusherClient.REFUSE, "rejected connection, "+e.getMessage());
 		}

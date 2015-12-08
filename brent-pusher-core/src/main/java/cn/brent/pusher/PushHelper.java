@@ -45,26 +45,12 @@ public class PushHelper {
 
 		for (IPusherClient webc : session.getClients()) {
 			try {
-				webc.send(ret.toJSONString());
+				webc.send(ret.toJSONString(),msg.isSucessClose());
 			} catch (Exception e) {
 				logger.error("push failed:", e);
 			}
 		}
-		if (!msg.isSucessClose()) {
-			return;
-		}
-		try {
-			Thread.sleep(500);// 延迟半秒钟，防止客户端未收到消息就关闭连接了
-		} catch (InterruptedException e1) {
-		}
-		for (IPusherClient webc : session.getClients()) {
-			try {
-				webc.close(IPusherClient.NORMAL, "business completion");
-			} catch (Exception e) {
-				logger.error("push failed:", e);
-			}
-		}
-		Config.getConstants().getSessionManager().removeSession(session);
+		
 	}
 
 }
