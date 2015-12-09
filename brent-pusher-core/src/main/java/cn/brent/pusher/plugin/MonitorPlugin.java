@@ -12,11 +12,11 @@ public class MonitorPlugin implements IPlugin {
 	
 	protected Thread monitorThread;
 	
-	/** 监控扫描间隔 单位秒   默认5分钟 */
+	/** 监控扫描间隔 单位毫秒   默认5分钟 */
 	protected long monitorInterval = 5 * 60 * 1000;
 	
 	public MonitorPlugin(long monitorInterval) {
-		this.monitorInterval = monitorInterval*1000;
+		this.monitorInterval = monitorInterval;
 	}
 	
 	protected void log() {

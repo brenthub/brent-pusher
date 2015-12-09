@@ -56,7 +56,8 @@ public abstract class PusherServer {
 			
 			conn.setTopic(path.getTopic());
 			conn.setKey(path.getKey());
-
+			conn.setTimeOut(path.getTimeOut());
+			
 			//保存会话信息
 			sessionManager.saveConnect(conn);
 			

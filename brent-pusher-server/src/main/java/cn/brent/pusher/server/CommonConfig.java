@@ -37,11 +37,11 @@ public class CommonConfig extends PusherConfig {
 	String keyMaxConnectLimit = getConfig("keyMaxConnect.limit", "5");
 	
 	boolean monitorStart = Boolean.parseBoolean(getConfig("monitor.start", "false"));
-	String monitorInterval = getConfig("monitor.interval", "30");
+	String monitorInterval = getConfig("monitor.interval", "30000");
 	
 	boolean cleanStart = Boolean.parseBoolean(getConfig("clean.start", "false"));
-	String cleanCheckInterval = getConfig("clean.checkInterval", "30");
-	String cleanTimeout = getConfig("clean.timeout", "1200");
+	String cleanCheckInterval = getConfig("clean.checkInterval", "30000");
+	String cleanTimeout = getConfig("clean.timeout", "120000");
 	
 	int port=Integer.parseInt(getConfig("port", "8887"));
 	

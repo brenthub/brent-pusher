@@ -22,6 +22,8 @@ public class PusherChannel extends NioSocketChannel implements IPusherClient {
 	protected static final AttributeKey<String> KEY = AttributeKey.newInstance("key");
 
 	protected static final AttributeKey<Map<String, Object>> ATTRS = AttributeKey.newInstance("attrs");
+	
+	protected static final AttributeKey<Long> TIME_OUT = AttributeKey.newInstance("timeout");
 
 	protected final long createTime;
 
@@ -83,6 +85,22 @@ public class PusherChannel extends NioSocketChannel implements IPusherClient {
 		Attribute<String> attribute = attr(TOPIC);
 		attribute.set(topic);
 	}
+	
+	@Override
+	public Long getTimeOut() {
+		Attribute<Long> attribute = attr(TIME_OUT);
+		return attribute.get();
+	}
+
+	@Override
+	public void setTimeOut(Long timeout) {
+		if(timeout==null){
+			return;
+		}
+		Attribute<Long> attribute = attr(TIME_OUT);
+		attribute.set(timeout);
+	}
+
 
 	@Override
 	public long getCreateTime() {
@@ -116,5 +134,6 @@ public class PusherChannel extends NioSocketChannel implements IPusherClient {
 			this.send(message);
 		}
 	}
+
 
 }

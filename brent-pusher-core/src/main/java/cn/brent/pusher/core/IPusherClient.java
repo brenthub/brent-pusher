@@ -84,5 +84,15 @@ public interface IPusherClient {
 	void send(String message,boolean close);
 	
 
+	/**
+	 * 获取超时时间
+	 * @return
+	 */
+	Long getTimeOut();
+	
+	/**
+	 * 设置超时时间
+	 */
+	void setTimeOut(Long timeout);
 	
 }

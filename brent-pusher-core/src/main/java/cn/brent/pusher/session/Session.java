@@ -1,9 +1,9 @@
 package cn.brent.pusher.session;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import cn.brent.pusher.core.IPusherClient;
 
@@ -22,7 +22,7 @@ public class Session {
 	protected String topic;
 
 	/** WebSockets */
-	protected Collection<IPusherClient> clients=new ArrayList<IPusherClient>();
+	protected Collection<IPusherClient> clients=new CopyOnWriteArrayList<IPusherClient>();
 	
 	/** 属性 */
 	protected Map<String,Object> attrs;

@@ -1,7 +1,7 @@
 package cn.brent.pusher.session.imp;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cn.brent.pusher.core.IPusherClient;
 import cn.brent.pusher.session.ISessionManager;
@@ -9,7 +9,7 @@ import cn.brent.pusher.session.Session;
 
 public class MapSessionManager implements ISessionManager {
 
-	protected Map<String, Session> sessionMap = new HashMap<String, Session>();
+	protected Map<String, Session> sessionMap = new ConcurrentHashMap<String, Session>();
 
 	@Override
 	public Session getSession(String topic, String key) {

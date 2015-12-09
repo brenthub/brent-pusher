@@ -39,7 +39,7 @@ WEB_SOCKET_SWF_LOCATION = "web-socket-js/WebSocketMain.swf";
 			}
 		}
 		$(document).ready(function() {
-			initWs("ws://localhost:8887/order/1000000?sign=000000");
+			initWs("ws://localhost:8887/order/1000000?timeout=10000&sign=000000");
 		});
 	</script>
 	等待推送结果。。。。
