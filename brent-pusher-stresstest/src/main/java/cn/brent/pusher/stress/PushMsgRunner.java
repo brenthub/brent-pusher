@@ -127,7 +127,7 @@ public class PushMsgRunner extends JFrame {
 			
 			@Override
 			public void configPlugin(Plugins me) {
-				me.add(new CleanUpPlugin(10, 10));
+				me.add(new CleanUpPlugin(10L, 10));
 				me.add(new MonitorPlugin(3));
 			}
 			
